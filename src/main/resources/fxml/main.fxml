@@ -41,7 +41,7 @@
                   <Insets />
                </HBox.margin>
             </MenuBar>
-            <TextField fx:id="filter" onKeyTyped="#filter" promptText="Filter" style="-fx-border-radius: 0; -fx-background-radius: 0;" />
+            <TextField fx:id="filter" onKeyTyped="#filter" prefWidth="200.0" promptText="Filter" style="-fx-border-radius: 0; -fx-background-radius: 0;" />
          </children>
       </HBox>
    </top>

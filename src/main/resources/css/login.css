@@ -1,0 +1,30 @@
+.loginButton {
+    -fx-shape: 'M53 27 L31 49 L52 70 L74 48 Z';
+    -fx-text-fill: white;
+    -fx-font-family: "Arial Narrow";
+    -fx-font-weight: bold;
+    -fx-background-color: linear-gradient(#61a2b1, #2A5058);
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+    -fx-graphic: url("/imgs/login1.png");
+}
+
+.loginButton:hover {
+    -fx-background-color: linear-gradient(#2A5058, #61a2b1);
+}
+
+
+.usernameInput {
+    -fx-shape: 'M84 50 L98 36 L13 36 L0 50 Z';
+}
+
+.pwdInput {
+    -fx-shape: 'M84 50 L98 62 L13 62 L0 50 Z';
+}
+
+.text-field {
+    -fx-background-insets: 0;
+    -fx-background-color: #ffffff;
+    -fx-padding: 4 24 4 24;
+    -fx-border-width: 1;
+    -fx-border-color: #878787;
+}

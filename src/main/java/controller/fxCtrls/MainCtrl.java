@@ -158,7 +158,12 @@ public class MainCtrl {
      * Updates all rows in the main tableView
      */
     void updateTable() {
-        ArrayList<PwdEntity> entities = jdbc.getAllPwd();
+        ArrayList<PwdEntity> entities;
+        if (filter.getText().length() == 0) {
+            entities = jdbc.getAllPwd();
+        } else {
+            entities = jdbc.getFilteredPwd(filter.getText());
+        }
         ObservableList<PwdEntity> data = FXCollections.observableArrayList();
         data.addAll(entities);
         tableView.setItems(data);
@@ -186,14 +191,6 @@ public class MainCtrl {
 
     @FXML
     private void filter() {
-        ArrayList<PwdEntity> entities;
-        if (filter.getText().length() == 0) {
-            entities = jdbc.getAllPwd();
-        } else {
-            entities = jdbc.getFilteredPwd(filter.getText());
-        }
-        ObservableList<PwdEntity> data = FXCollections.observableArrayList();
-        data.addAll(entities);
-        tableView.setItems(data);
+        updateTable();
     }
 }
