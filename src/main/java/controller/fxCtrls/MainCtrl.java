@@ -13,12 +13,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
 import javafx.stage.Modality;
@@ -30,8 +25,13 @@ import model.model.PwdEntity;
 public class MainCtrl {
 
     @FXML private TableView tableView;
+    @FXML private TextField filter;
     private JDBC jdbc = Main.getConnection();
 
+    /**
+     * Init function, sets up the basics of the main tableView
+     * like...  columns, default sizes, row click actions
+     */
     @FXML
     private void initialize() {
         Main.getWindow().setTitle("Password Manager");
@@ -72,14 +72,17 @@ public class MainCtrl {
                     cm.getItems().add(mi2);
                     cm.getItems().add(mi3);
 
+                    // Open edit row modal
                     mi1.setOnAction(e -> openEditRow(row.getItem()));
 
+                    // Copy password to clipboard
                     mi2.setOnAction(e -> {
                         StringSelection stringSelection = new StringSelection(row.getItem().getPassword());
                         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                         clipboard.setContents(stringSelection, null);
                     });
 
+                    // Remove current row from DB
                     mi3.setOnAction(e -> {
                         String body = String.format("This action cannot be undone! \nAre you sure you want to delete row %s", row.getItem().getTitle());
                         ButtonType b = PopUp.openWarning("Remove row", body,ButtonType.YES, ButtonType.NO);
@@ -92,6 +95,7 @@ public class MainCtrl {
 
                     cm.show(Main.getWindow(), event.getScreenX(), event.getScreenY());
                 } else if (event.getClickCount() == 2) {
+                    // Open edit row modal
                     openEditRow(row.getItem());
                 }
             });
@@ -101,6 +105,10 @@ public class MainCtrl {
         updateTable();
     }
 
+    /**
+     * Opens an edit row modal (not fxml related)
+     * @param row the row that we wanna edit
+     */
     private void openEditRow(PwdEntity row) {
         FXMLLoader loader = openPopUp("/fxml/editRow.fxml", "Edit row");
         if (loader != null) {
@@ -109,21 +117,32 @@ public class MainCtrl {
         }
     }
 
+    /**
+     * Opens a modal where we can add new rows (fxml related)
+     */
     @FXML
     private void openNewRow() {
         openPopUp("/fxml/newRow.fxml", "Add new password");
     }
 
+    /**
+     * Opens a generic modal based on the fxmlPath
+     * @param fxmlPath the path of the fxml file (template)
+     * @param title the title of modal
+     * @return FXMLLoader in case we want to get or pass information through the modal's controller
+     */
     private FXMLLoader openPopUp(String fxmlPath, String title) {
         Parent root;
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(Main.class.getResource(fxmlPath));
+
         try {
             root = loader.load();
         } catch (IOException e) {
             System.out.println("Error during opening popUp");
             return null;
         }
+
         Stage popUp = new Stage();
         popUp.setScene(new Scene(root));
         popUp.setResizable(false);
@@ -131,9 +150,13 @@ public class MainCtrl {
         popUp.initModality(Modality.APPLICATION_MODAL);
         popUp.setTitle(title);
         popUp.show();
+
         return loader;
     }
 
+    /**
+     * Updates all rows in the main tableView
+     */
     void updateTable() {
         ArrayList<PwdEntity> entities = jdbc.getAllPwd();
         ObservableList<PwdEntity> data = FXCollections.observableArrayList();
@@ -141,6 +164,9 @@ public class MainCtrl {
         tableView.setItems(data);
     }
 
+    /**
+     * Removes all rows from the DB then updates the table
+     */
     public void removeAll() {
         String body = "This action cannot be reversed! \nAre you sure you want to delete all passwords?";
         ButtonType t = PopUp.openWarning("Removing all rows", body,ButtonType.YES, ButtonType.NO);
@@ -151,7 +177,23 @@ public class MainCtrl {
         }
     }
 
+    /**
+     * Closes the main window/the whole app
+     */
     public void closeWindow() {
         Main.getWindow().close();
+    }
+
+    @FXML
+    private void filter() {
+        ArrayList<PwdEntity> entities;
+        if (filter.getText().length() == 0) {
+            entities = jdbc.getAllPwd();
+        } else {
+            entities = jdbc.getFilteredPwd(filter.getText());
+        }
+        ObservableList<PwdEntity> data = FXCollections.observableArrayList();
+        data.addAll(entities);
+        tableView.setItems(data);
     }
 }

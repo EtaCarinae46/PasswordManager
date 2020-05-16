@@ -64,6 +64,19 @@ public class JDBC {
         }
     }
 
+    public ArrayList<PwdEntity> getFilteredPwd(String filter) {
+        try {
+            ArrayList<PwdEntity> entities = new ArrayList<>();
+            ResultSet rs = createStatement.executeQuery(Queries.filteredPwds(filter));
+            while (rs.next())
+                entities.add(entityFromRs(rs));
+            return entities;
+        } catch (SQLException e) {
+            System.out.println("Error during 'getAllPwd'");
+            return null;
+        }
+    }
+
     public int getNextId() {
         try {
             ResultSet rs = createStatement.executeQuery(Queries.GET_MAX_ID);
